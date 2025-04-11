@@ -1,0 +1,38 @@
+.journal-textarea {
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid #645858;
+    border-radius: 4px;
+  }
+  
+  .chat-button {
+    padding: 0.6rem 1.4rem;
+    background-color: #bea4cd;
+    color: #5c2c82;
+    border: 2px solid #392d41;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .chat-button:hover {
+    background-color: #f3e9fa;
+    border-color: #b388d8;
+  }
+  
+  .journal-button:disabled {
+    background-color: #c7ddea;
+    cursor: not-allowed;
+  }
+  
+  .journal-response {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #e0f7fa;
+    border-left: 5px solid #9b59b6;
+  }
+  
