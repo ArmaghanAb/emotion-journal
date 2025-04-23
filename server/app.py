@@ -7,6 +7,9 @@ from flask_cors import CORS
 import openai
 import os
 from dotenv import load_dotenv
+from collections import defaultdict
+import json
+from datetime import datetime
 from routes.chat import chat_bp
 
 
@@ -40,6 +43,41 @@ def analyze():
     # Extract and return AI-generated response
     ai_output = response.choices[0].message["content"]
     return jsonify({"response": ai_output})
+
+
+@app.route('/analytics')
+def analytics():
+    try:
+        with open('chat_data.json', 'r') as f:
+            data = json.load(f)
+
+        # Count messages per day
+        messages_per_day = defaultdict(int)
+        sentiment_trends = defaultdict(lambda: {"positive": 0, "neutral": 0, "negative": 0})
+
+        for item in data:
+            date = item['timestamp']
+            messages_per_day[date] += 1
+
+            sentiment = item.get('sentiment', 'neutral').lower()
+            if sentiment in ["positive", "negative", "neutral"]:
+                sentiment_trends[date][sentiment] += 1
+
+        # Format for charts
+        messages_output = [{"date": d, "messages": count} for d, count in messages_per_day.items()]
+        sentiment_output = [
+            {"date": d, **vals} for d, vals in sentiment_trends.items()
+        ]
+
+        return jsonify({
+            "messages_per_day": sorted(messages_output, key=lambda x: x["date"]),
+            "sentiment_trends": sorted(sentiment_output, key=lambda x: x["date"])
+        })
+
+    except Exception as e:
+        print("Error loading analytics:", e)
+        return jsonify({"error": "Could not process analytics"}), 500
+
 
 # Run the Flask app
 if __name__ == "__main__":

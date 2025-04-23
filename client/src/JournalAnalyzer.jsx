@@ -1,48 +1,83 @@
-// client/src/JournalAnalyzer.jsx
-import React, { useState } from 'react';
+// JournalAnalyzer.jsx
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './JournalAnalyzer.css';
 
 const JournalAnalyzer = () => {
-  // State for user entry input
   const [entry, setEntry] = useState('');
-
-  // State for AI response
-  const [response, setResponse] = useState('');
-
-  // Loading state
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
 
-  // Handle submit
   const handleAnalyze = async (e) => {
     e.preventDefault();
+    if (!entry.trim()) return;
+
+    const userEntry = {
+      sender: 'user',
+      text: entry,
+      time: Date.now(),
+    };
+    setMessages((prev) => [...prev, userEntry]);
     setLoading(true);
 
     try {
-      // POST journal entry to Flask backend
       const res = await axios.post('http://localhost:5000/analyze', {
         entry: entry,
       });
 
-      // Set AI response
-      setResponse(res.data.response);
-      setEntry('');
+      const aiResponse = {
+        sender: 'ai',
+        text: res.data.response,
+        time: Date.now(),
+      };
+      setMessages((prev) => [...prev, aiResponse]);
     } catch (err) {
-      console.error('Error analyzing journal:', err);
-      setResponse('Error: Could not analyze journal entry.');
+      const errorMsg = {
+        sender: 'ai',
+        text: 'Error: Could not analyze journal entry.',
+        time: Date.now(),
+      };
+      setMessages((prev) => [...prev, errorMsg]);
     } finally {
+      setEntry('');
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
+    <div className="card">
       <h2>Emotion Journal - Mood Analyzer</h2>
+
+      <div className="chat-history">
+        {messages.map((msg, idx) => (
+          <div
+            key={idx}
+            className={`chat-bubble ${msg.sender === 'user' ? 'user-bubble' : 'ai-bubble'}`}
+          >
+            <p className="chat-text">{msg.text}</p>
+            <span className="chat-time">
+              {new Date(msg.time).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </span>
+          </div>
+        ))}
+        {loading && (
+          <div className="typing-indicator">AI is thinking...</div>
+        )}
+        <div ref={bottomRef}></div>
+      </div>
 
       <form onSubmit={handleAnalyze}>
         <textarea
+          className="chat-textarea"
           rows="6"
-          style={{ width: '100%', marginBottom: '1rem' }}
           placeholder="Write about your day or how you're feeling..."
           value={entry}
           onChange={(e) => setEntry(e.target.value)}
@@ -52,13 +87,6 @@ const JournalAnalyzer = () => {
           {loading ? 'Analyzing...' : 'Analyze Mood'}
         </button>
       </form>
-
-      {/* Show response if available */}
-      {response && (
-        <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#e0f7fa' }}>
-          <strong>AI Response:</strong> {response}
-        </div>
-      )}
     </div>
   );
 };
