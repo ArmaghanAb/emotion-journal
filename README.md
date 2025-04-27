@@ -5,7 +5,7 @@ An AI-powered mental health companion that allows users to track their emotions,
 
 Emotion Journal combines AI technologies like OpenAI and LangChain with a modern full-stack architecture to help users better understand their mental wellness over time. It features real-time conversation, sentiment analysis, text-to-speech (TTS), speech-to-text input, and a live analytics dashboard.
 
-[App Walkthrough](src/assets/Walkthrough.gif)
+[App Walkthrough](client/src/assets/Walkthrough.gif)
 
 
 ---
