@@ -76,7 +76,7 @@ body {
 }
 
 .component-wrapper {
-  background-color: #fcfcfc;
+  background-color: #c2bebe;
   border: 1px solid #382e2e;
   padding: 2rem;
   border-radius: 8px;
@@ -88,4 +88,10 @@ body {
 /* Docs link */
 .read-the-docs {
   color: #888;
+}
+
+#voiceSelect{
+  margin:10px;
+  padding:4px;
+  border:#5b394d, solid, 2px;
 }

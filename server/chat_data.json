@@ -1,0 +1,21 @@
+[
+    {
+      "timestamp": "2025-04-23",
+      "message": "help me with stress",
+      "reply": "Try deep breathing and mindfulness.",
+      "sentiment": "positive"
+    },
+    {
+      "timestamp": "2025-04-23",
+      "message": "I feel overwhelmed",
+      "reply": "Talk to someone you trust.",
+      "sentiment": "negative"
+    },
+    {
+      "timestamp": "2025-04-22",
+      "message": "today was fine",
+      "reply": "Glad to hear that!",
+      "sentiment": "neutral"
+    }
+  ]
+  

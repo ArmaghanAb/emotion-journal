@@ -9,6 +9,22 @@ const Chat = ({ ttsEnabled, selectedVoiceURI }) => {
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
 
+  // Ensure voices are loaded
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = speechSynthesis.getVoices();
+      console.log("Available voices:", voices);
+  
+      if (!voices.length) {
+        speechSynthesis.onvoiceschanged = () => {
+          console.log("Voices loaded later:", speechSynthesis.getVoices());
+        };
+      }
+    };
+  
+    loadVoices();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -24,18 +40,36 @@ const Chat = ({ ttsEnabled, selectedVoiceURI }) => {
 
       const aiMsg = {
         sender: 'ai',
-        text: response.data.reply,
+        text: typeof response.data.reply === 'string'
+        ? response.data.reply
+        : JSON.stringify(response.data.reply, null, 2),
+
         time: Date.now(),
       };
       setMessages((prev) => [...prev, aiMsg]);
 
       if (ttsEnabled && 'speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(response.data.reply);
-        const voice = speechSynthesis.getVoices().find((v) => v.voiceURI === selectedVoiceURI);
-        if (voice) utterance.voice = voice;
+        const voices = window.speechSynthesis.getVoices();
+        const selected = voices.find(v => v.voiceURI === selectedVoiceURI);
+      
+        if (selected) {
+          utterance.voice = selected;
+        } else {
+          console.warn("TTS voice not found, using default.");
+        }
+      
         utterance.lang = 'en-US';
-        window.speechSynthesis.speak(utterance);
+        utterance.rate = 1;       // normal speed
+        utterance.pitch = 1;      // normal tone
+        utterance.volume = 1;     // max volume
+      
+        window.speechSynthesis.cancel(); // stop previous speech
+        setTimeout(() => {
+          window.speechSynthesis.speak(utterance);
+        }, 200); // delay ensures voices are ready
       }
+      
     } catch (error) {
       const errorMsg = {
         sender: 'ai',
